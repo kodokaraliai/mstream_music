@@ -352,9 +352,12 @@ class ApiManager {
     List<DisplayItem> newList = [];
 
     res['files'].forEach((e) {
+      String originalName = e['name'] ?? 'No Name';
+      var name = originalName.split("/").last.replaceFirst(".mp3", "");
+
       DisplayItem newItem = new DisplayItem(
           server,
-          e['name'],
+          name,
           'file',
           "/" + e['filepath'],
           Icon(Icons.music_note, color: Colors.blue),
