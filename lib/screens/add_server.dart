@@ -187,6 +187,7 @@ class MyCustomFormState extends State<MyCustomForm> {
           children: <Widget>[
             TextFormField(
                 controller: _urlCtrl,
+                keyboardType: TextInputType.url,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Server URL is needed';
@@ -200,7 +201,6 @@ class MyCustomFormState extends State<MyCustomForm> {
                     return 'Cannot Parse URL';
                   }
                 },
-                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   hintText: 'https://mstream.io',
                   labelText: 'Server URL',
