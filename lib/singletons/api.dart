@@ -334,4 +334,35 @@ class ApiManager {
 
     BrowserManager().addListToStack(newList);
   }
+
+  Future<int> searchFiles(String searchString, {Server? useThisServer}) async {
+    Server server = ServerManager().currentServer ??
+        useThisServer ??
+        (throw Exception('No Server Selected'));
+    var res;
+    try {
+      res = await makeServerCall(
+          useThisServer, '/api/v1/db/search', {"search": searchString}, 'POST');
+    } catch (err) {
+      // TODO: Handle Errors
+      print(err);
+      return -1;
+    }
+    BrowserManager().setBrowserLabel('Search results');
+    List<DisplayItem> newList = [];
+
+    res['files'].forEach((e) {
+      DisplayItem newItem = new DisplayItem(
+          server,
+          e['name'],
+          'file',
+          "/" + e['filepath'],
+          Icon(Icons.music_note, color: Colors.blue),
+          null);
+      newList.add(newItem);
+    });
+
+    BrowserManager().addListToStack(newList);
+    return newList.length;
+  }
 }

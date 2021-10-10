@@ -155,7 +155,6 @@ class Browser extends StatelessWidget {
         extras: {'server': i.server!.localname, 'path': i.data});
 
     MediaManager().audioHandler.addQueueItem(item);
-
     // TODO: Fire of request for metadata
   }
 
@@ -460,6 +459,7 @@ class Browser extends StatelessWidget {
                 onPressed: () {
                   BrowserManager().popBrowser();
                 }),
+            StatefulSearch(),
             Row(children: <Widget>[
               IconButton(
                   icon: Icon(
@@ -540,5 +540,69 @@ class Browser extends StatelessWidget {
                         });
                   })))
     ]);
+  }
+}
+
+/// This is the stateful widget that the main application instantiates.
+class StatefulSearch extends StatefulWidget {
+  const StatefulSearch({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulSearch> createState() => _StatefulSearchState();
+}
+
+/// This is the private State class that goes with MyStatefulWidget.
+class _StatefulSearchState extends State<StatefulSearch> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onSubmitted(String value) async {
+    final resultCount = await ApiManager().searchFiles(value);
+    if (resultCount == -1 || resultCount == 0) {
+      return await showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Search results'),
+            content: resultCount == 0
+                ? Text('No results were found')
+                : Text("Error occured"),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: TextField(
+          decoration: InputDecoration(
+              hintText: 'Search',
+              border: OutlineInputBorder(),
+              hintStyle: TextStyle(color: Colors.black)),
+          style: TextStyle(color: Colors.black),
+          controller: _controller,
+          onSubmitted: _onSubmitted),
+    );
   }
 }
